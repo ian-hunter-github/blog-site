@@ -1,6 +1,5 @@
 import { Box, Typography, Grid } from '@mui/material';
 import { GitHub, LinkedIn, Twitter, Mail } from '@mui/icons-material';
-import Layout from '../components/Layout';
 
 export default function ContactPage() {
     return (

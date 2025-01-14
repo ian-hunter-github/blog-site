@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { usePosts } from "../context/PostsContext";
-import Layout from "../components/Layout";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";

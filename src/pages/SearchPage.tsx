@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import BlogCard from '../components/BlogCard';
 import { BlogPost } from '../types/blog';
 import { blogPosts } from '../data/posts';
-import Layout from '../components/Layout';
 
 export default function SearchPage() {
     const location = useLocation();

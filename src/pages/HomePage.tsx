@@ -2,7 +2,6 @@
 import { Grid, Card, CardContent, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { usePosts } from "../context/PostsContext";
-import Layout from "../components/Layout";
 
 
 const HomePageContent = () => {
