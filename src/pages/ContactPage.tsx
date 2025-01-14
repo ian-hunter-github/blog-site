@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 
 export default function ContactPage() {
     return (
-        <Layout>
+        <>
             <div className="container mx-auto px-4 py-8">
                 <Grid container spacing={6} className="items-center">
                     <Grid item xs={12} md={4}>
@@ -62,7 +62,7 @@ export default function ContactPage() {
                     </Grid>
                 </Grid>
             </div>
-        </Layout>
+        </>
     );
 }
 

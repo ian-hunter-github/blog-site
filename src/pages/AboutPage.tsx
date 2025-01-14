@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 
 export default function AboutPage() {
   return (
-    <Layout>
+    <>
 
       <div className="container mx-auto px-4 py-8">
         <Box className="max-w-3xl mx-auto">
@@ -36,7 +36,7 @@ export default function AboutPage() {
           </Typography>
         </Box>
       </div>
-    </Layout>
+    </>
 
   );
 }

@@ -34,7 +34,7 @@ export default function SearchPage() {
     // };
 
     return (
-        <Layout>
+        <>
             <div className="container mx-auto px-4 py-8">
                 <Box className="mb-6">
                     <Link to="/" className="text-primary hover:underline">
@@ -64,7 +64,7 @@ export default function SearchPage() {
                     </Typography>
                 )}
             </div>
-        </Layout>
+        </>
     );
 }
 

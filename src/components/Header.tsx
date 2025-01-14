@@ -77,6 +77,9 @@ export default function Header({ headerColor = "LemonChiffon" }: { headerColor?:
             <Link to="/contact" style={{ textDecoration: "none" }}>
               <Button color="inherit">Contact</Button>
             </Link>
+            <Link to="/editor" style={{ textDecoration: "none" }}>
+              <Button color="inherit">Editor</Button>
+            </Link>
           </Box>
         ) : (
           // Menu Icon Section (for smaller screens)
@@ -100,6 +103,11 @@ export default function Header({ headerColor = "LemonChiffon" }: { headerColor?:
               </MenuItem>
               <MenuItem onClick={handleClose}>
                 <Link to="/contact" style={{ textDecoration: "none", color: "inherit" }}>
+                  Contact
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <Link to="/editor" style={{ textDecoration: "none", color: "inherit" }}>
                   Contact
                 </Link>
               </MenuItem>

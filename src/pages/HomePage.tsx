@@ -12,17 +12,17 @@ const HomePageContent = () => {
   if (!posts) {
     console.log("Posts are loading...");
     return (
-      <Layout>
+      <>
         <h1>Blog Posts</h1>
         <p>Loading...</p>
-      </Layout>
+      </>
     );
   }
 
   console.log("Posts in context:", posts);
 
   return (
-    <Layout>
+    <>
       <h1>Blog Posts</h1>
       <Grid container spacing={2}>
         {posts.length > 0 ? (
@@ -44,7 +44,7 @@ const HomePageContent = () => {
           <p>No posts available</p>
         )}
       </Grid>
-    </Layout>
+    </>
   );
 };
 

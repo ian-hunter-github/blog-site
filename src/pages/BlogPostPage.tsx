@@ -25,19 +25,19 @@ const BlogPostPage = () => {
 
   if (!post) {
     return (
-      <Layout>
+      <>
         <h1>Post Not Found</h1>
         <p>The post you are looking for does not exist or has been removed.</p>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
+    <>
       <h1>{post.title}</h1>
       <p>{post.summary}</p>
       <div>{renderHTML(post.content)}</div>
-    </Layout>
+    </>
   );
 };
 
