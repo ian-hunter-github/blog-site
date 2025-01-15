@@ -5,13 +5,14 @@ const BlogCardStyles = {
       justifyContent: 'space-between',
       height: '100%',
       padding: '16px',
-      backgroundColor: '#E3F2FD', // Light Blue background
+      backgroundColor: '#F9F9F9', //'#E3F2FD', // Light Blue background
       borderRadius: '8px',
       boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
       transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       '&:hover': {
         transform: 'translateY(-4px)',
         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
+        backgroundColor : "#FFECE5"
       },
     },
     date: {
