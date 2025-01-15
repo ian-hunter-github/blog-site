@@ -51,3 +51,8 @@ jest-report.json
 
 # Netlify
 netlify.toml
+
+# Compressed files
+.tgz
+.zip
+

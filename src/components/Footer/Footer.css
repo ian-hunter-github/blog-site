@@ -1,0 +1,21 @@
+.header {
+    background-color: #ebd809; /* #003366 Darker blue for better contrast */
+    padding: 10px;
+    text-align: center;
+}
+
+.header a {
+    color: var(--accent-color); /* Sea Green */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+}
+
+.header a:hover {
+    color: var(--primary-color); /* Coral */
+    background-color: rgba(255, 215, 0, 0.4); /* Gold */
+    text-decoration: underline;
+}

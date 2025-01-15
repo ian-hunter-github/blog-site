@@ -3,7 +3,7 @@ import { useState } from "react";
 import ReactMarkdownEditorLite from "react-markdown-editor-lite";
 import ReactMarkdown from "react-markdown";
 import "react-markdown-editor-lite/lib/index.css";
-import "../index.css";
+//import "../index.css";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
@@ -18,6 +18,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import CircularProgress from "@mui/material/CircularProgress";
 import SearchIcon from "@mui/icons-material/Search";
+import { BlogPost } from "../types/blog";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -29,7 +30,15 @@ const renderHTML = (text: string) => {
 let copyCounter = 1;
 
 const BlogPostEditorPage = () => {
-  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState<BlogPost>( {
+    created_at: "",
+    author: "",
+    id: "",
+    title: "",
+    summary: "",
+    content: "",
+    image: "" // Always required
+  });
   const [originalData, setOriginalData] = useState({
     title: "",
     summary: "",
@@ -44,7 +53,7 @@ const BlogPostEditorPage = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchDialog, setShowSearchDialog] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(false); // Spinner state
   const [dialog, setDialog] = useState({
     open: false,
@@ -75,6 +84,7 @@ const BlogPostEditorPage = () => {
       const data = await response.json();
       setSearchResults(data.posts || []);
       setShowSearchDialog(true); // Ensure dialog opens
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDialog({
         open: true,
@@ -89,7 +99,7 @@ const BlogPostEditorPage = () => {
     }
   };
 
-  const handleSelectPost = (post: any) => {
+  const handleSelectPost = (post: BlogPost) => {
     setSelectedPost(post);
     setOriginalData({
       title: post.title,
@@ -124,6 +134,7 @@ const BlogPostEditorPage = () => {
         onYes: () => setDialog({ ...dialog, open: false }),
         onNo: () => {}, // Ensure onNo is always defined
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDialog({
         open: true,
@@ -161,6 +172,7 @@ const BlogPostEditorPage = () => {
         onYes: () => setDialog({ ...dialog, open: false }),
         onNo: () => {}, // Ensure onNo is always defined
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDialog({
         open: true,
@@ -206,13 +218,14 @@ const BlogPostEditorPage = () => {
         onYes: () => setDialog({ ...dialog, open: false }),
         onNo: () => {}, // Ensure onNo is always defined
       });
-      setSelectedPost(null);
+      //setSelectedPost();
       setFormData({
         title: "",
         summary: "",
         content: "",
         createdAt: new Date().toISOString(),
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDialog({
         open: true,

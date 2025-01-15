@@ -7,6 +7,8 @@ interface Post {
   summary: string;
   content: string;
   created_at: string;
+  author: string;
+  image: string;
 }
 
 interface PostsContextType {
