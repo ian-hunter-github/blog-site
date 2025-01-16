@@ -1,30 +1,28 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import './Footer.css';
+import React from "react";
+import { Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
-export default function Footer() {
-  const theme = useTheme();
+const Footer: React.FC = () => {
+  const theme = useTheme(); // Access the current theme
+
+  console.log("Theme Secondary Main:", theme.palette.secondary.main);
+  console.log("Theme Text Secondary:", theme.palette.text.secondary);
 
   return (
     <Box
       component="footer"
       sx={{
-        marginTop: "auto", // Ensures the footer is pushed to the bottom
-        width: "100%", // Full width of the page
-        padding: "16px", // Padding for spacing
-        borderTop: "1px solid #ddd", // Optional top border for separation
-        backgroundColor: theme.palette.primary.main, // Theme-based background color
-        height: "128px", // Double the standard height (e.g., 64px * 2)
+        backgroundColor: `${theme.palette.secondary.main} !important`, // Dynamic theme color
+        color: theme.palette.text.secondary, // Dynamic text color
+        textAlign: "center",
+        padding: "16px",
       }}
     >
-      <Typography
-        variant="body2"
-        sx={{
-          textAlign: "center", // Center-align the text
-          color: theme.palette.text.secondary, // Use theme text color
-        }}
-      >
+      <Typography variant="body2">
         © {new Date().getFullYear()} My Blog. All rights reserved.
       </Typography>
     </Box>
   );
-}
+};
+
+export default Footer;

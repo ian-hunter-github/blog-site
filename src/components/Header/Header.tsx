@@ -13,6 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
+import ThemeSelector from "../ThemeSelector";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -109,6 +110,7 @@ export default function Header() {
                 Editor
               </Button>
             </Link>
+            <ThemeSelector/>
           </Box>) : (
           // Menu Icon Section (for smaller screens)
           <>
