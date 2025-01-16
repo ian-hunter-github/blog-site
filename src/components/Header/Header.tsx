@@ -13,13 +13,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
-import ThemeSelector from "../ThemeSelector";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const theme = useTheme();
-  const isMediumOrLarger = useMediaQuery(theme.breakpoints.up("md"));
+  const theme = useTheme(); // Access the default theme
+
+  const isMediumOrLarge = useMediaQuery(theme.breakpoints.up("md"));
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,8 +34,8 @@ export default function Header() {
       position="sticky"
       elevation={1}
       sx={{
-        backgroundColor: theme.palette.primary.main, // Use primary color for background
-        color: theme.palette.primary.contrastText, // Ensure text contrasts with background
+        backgroundColor: theme.palette.primary.main, // High-contrast background
+        color: theme.palette.primary.contrastText, // Ensure readable text
       }}
     >
       <Toolbar
@@ -43,7 +43,6 @@ export default function Header() {
           display: "flex",
           justifyContent: "space-between", // Align logo and links
           alignItems: "center",
-          padding: theme.spacing(1, 2), // Adjust padding using theme spacing
         }}
       >
         {/* Logo Section */}
@@ -61,57 +60,33 @@ export default function Header() {
             alt="Blog Logo"
             width={150}
             height={40}
-            style={{ marginRight: theme.spacing(2) }} // Add space between logo and links
           />
         </Link>
 
         {/* Links Section */}
-        {isMediumOrLarger ? (
-          <Box sx={{ display: "flex", gap: 2, padding: "16px", backgroundColor: "inherit" }}>
-            <Link to="/about" style={{ textDecoration: "none" }}>
+        {isMediumOrLarge ? (
+          <Box sx={{ display: "flex", gap: 2 }}>
+          {["about", "contact", "editor"].map((path) => (
+            <Link
+              to={`/${path}`}
+              key={path}
+              style={{ textDecoration: "none" }}
+            >
               <Button
                 variant="text"
                 sx={{
-                  color: "text.primary", // Use theme's text primary color
+                  color: theme.palette.primary.contrastText, //"inherit", // Inherit color from AppBar
                   "&:hover": {
-                    color: "text.secondary", // Use theme's primary color on hover
+                    color: theme.palette.secondary.main, // Highlight on hover
                   },
-                  fontSize: "1.25rem"
+                  fontSize: "1.25rem",
                 }}
               >
-                About
+                {path.charAt(0).toUpperCase() + path.slice(1)}
               </Button>
             </Link>
-            <Link to="/contact" style={{ textDecoration: "none" }}>
-              <Button
-                variant="text"
-                sx={{
-                  color: "text.primary",
-                  "&:hover": {
-                    color: "text.secondary",
-                  },
-                  fontSize: "1.25rem"
-                }}
-              >
-                Contact
-              </Button>
-            </Link>
-            <Link to="/editor" style={{ textDecoration: "none" }}>
-              <Button
-                variant="text"
-                sx={{
-                  color: "text.primary",
-                  "&:hover": {
-                    color: "text.secondary",
-                  },
-                  fontSize: "1.25rem"
-                }}
-              >
-                Editor
-              </Button>
-            </Link>
-            <ThemeSelector/>
-          </Box>) : (
+          ))}
+        </Box> ) : (
           // Menu Icon Section (for smaller screens)
           <>
             <IconButton
@@ -128,12 +103,6 @@ export default function Header() {
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleClose}
-              sx={{
-                "& .MuiPaper-root": {
-                  backgroundColor: theme.palette.background.paper, // Use theme background
-                  color: theme.palette.text.primary, // Use theme text color
-                },
-              }}
             >
               <MenuItem onClick={handleClose}>
                 <Link to="/about" style={{ textDecoration: "none", color: "inherit" }}>

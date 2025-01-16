@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import theme from "./themes/theme";
+import { ThemeProvider } from "@emotion/react";
 
 const rootElement = document.getElementById("root");
 
@@ -18,7 +20,9 @@ console.log("Rendering PostsProvider in index.tsx...");
 try {
   root.render(
     <React.StrictMode>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
     </React.StrictMode>
   );
   console.log("Root rendering complete.");

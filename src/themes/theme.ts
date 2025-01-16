@@ -1,127 +1,86 @@
-import { createTheme, PaletteColor, PaletteMode, PaletteOptions } from "@mui/material/styles";
-import { TypographyOptions } from "@mui/material/styles/createTypography";
+// src/theme.ts
+import { createTheme } from "@mui/material/styles";
 
-// **Typography Configuration**
-const typography: TypographyOptions = {
-  fontFamily: "'Roboto', sans-serif",
-  h1: {
-    fontFamily: "'Lato', sans-serif",
-    fontWeight: 700,
-    fontSize: "2.5rem",
-  },
-  h2: {
-    fontFamily: "'Lato', sans-serif",
-    fontWeight: 600,
-    fontSize: "2rem",
-  },
-  button: {
-    fontWeight: 600,
-    textTransform: "none",
-    fontSize: "1rem",
-  },
-};
-
-const palette: { light: PaletteOptions; dark: PaletteOptions } = {
-    light: {
-      mode: "light" as PaletteMode,
-      primary: {
-        main: "#FF7F50",
-        dark: "#E5673D",
-        light: "#FFAD85",
-      },
-      secondary: {
-        main: "#FFD700",
-      },
-      text: {
-        primary: "#333333", // Dark Gray
-        secondary: "#666666", // Subtle Gray
-      },
-      background: {
-        default: "#F8F8F8",
-        paper: "#FFFFFF",
-      },
+const theme = createTheme({
+  palette: {
+    mode: "light", // Use light mode by default
+    primary: {
+      main: "#003366", // Deep ocean blue
+      light: "#336699", // Lighter blue
+      dark: "#001A33", // Darker blue
+      contrastText: "#FFFFFF", // White for text contrast
     },
-    dark: {
-      mode: "dark" as PaletteMode,
-      primary: {
-        main: "#E5673D",
-        dark: "#B25030",
-        light: "#FF7F50",
-      },
-      secondary: {
-        main: "#FFD700",
-      },
-      text: {
-        primary: "#FFFFFF", // White
-        secondary: "#B0B0B0", // Light Gray
-      },
-      background: {
-        default: "#121212",
-        paper: "#1E1E1E",
-      },
+    secondary: {
+      main: "#00A0B0", // Ocean teal
+      light: "#33B2C2", // Lighter teal
+      dark: "#007080", // Darker teal
+      contrastText: "#FFFFFF", // White for text contrast
     },
-  };
-  
-// **Components Overrides**
-const components = (palette: PaletteOptions) => ({
-    MuiCssBaseline: {
-      styleOverrides: {
-        ":root": {
-          "--primary-color": (palette.primary as PaletteColor)?.main,
-          "--primary-dark": (palette.primary as PaletteColor)?.dark,
-          "--secondary-color": (palette.secondary as PaletteColor)?.main,
-          "--text-color": palette.text?.primary || "#333333",
-          "--background-color": palette.background?.default,
-        },
-      },
+    text: {
+      primary: "#002244", // Navy for primary text
+      secondary: "#004466", // Dark teal for secondary text
     },
+    background: {
+      default: "#F0F8FF", // Light blue-gray background
+      paper: "#FFFFFF", // White for card and modal backgrounds
+    },
+  },
+  typography: {
+    fontFamily: "'Roboto', 'Arial', sans-serif",
+    h1: {
+      fontSize: "2.5rem",
+      fontWeight: 700,
+      letterSpacing: "-0.01562em",
+    },
+    h2: {
+      fontSize: "2rem",
+      fontWeight: 600,
+      letterSpacing: "-0.00833em",
+    },
+    h3: {
+      fontSize: "1.75rem",
+      fontWeight: 500,
+      letterSpacing: "0em",
+    },
+    body1: {
+      fontSize: "1rem",
+      lineHeight: 1.5,
+    },
+    body2: {
+      fontSize: "0.875rem",
+      lineHeight: 1.43,
+    },
+    button: {
+      textTransform: "none", // Prevent uppercase transformation
+      fontWeight: 600,
+    },
+  },
+  components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          color: (palette.text as PaletteColor)?.main, // Use text color for buttons
-          "&:hover": {
-            color: (palette.secondary as PaletteColor)?.main, // Use primary color on hover
-          },
-          fontSize: "1.25rem",
-          padding: "8px 16px",
-        },
-      },
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          color: (palette.primary as PaletteColor)?.main, // Default link color
-          "&:hover": {
-            color: (palette.secondary as PaletteColor)?.dark, // Hover link color
-          },
-          textDecoration: "none",
+          borderRadius: 8, // Slightly rounded corners
+          padding: "8px 16px", // Add consistent padding
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: (palette.primary as PaletteColor)?.main, // AppBar background color
-          color: palette.text?.primary, // Text color in the AppBar
+          backgroundColor: "#003366", // Use primary main color for the header
+          color: "#FFFFFF", // White text
         },
       },
     },
-  });
-  
-  // **Light and Dark Themes**
-  const lightTheme = createTheme({
-    palette: palette.light,
-    typography,
-    components: components(palette.light), // Call the components function here
-  });
-  
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#FFFFFF", // White for paper components
+          color: "#002244", // Primary text color
+        },
+      },
+    },
+  },
+});
 
-  const darkTheme = createTheme({
-    palette: palette.light,
-    typography,
-    components: components(palette.dark), // Call the components function here
-  });
-  
-
-// **Export Themes and Configuration**
-export { lightTheme, darkTheme, palette, typography };
+export default theme;

@@ -4,5 +4,5 @@
 user_input=${1:-"default_value"}
 
 git add .
-git commit -m "${user-input"
+git commit -m "${user-input}"
 git push origin main

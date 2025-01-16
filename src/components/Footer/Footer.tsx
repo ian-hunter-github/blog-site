@@ -1,27 +1,26 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Paper, Typography, useTheme } from "@mui/material";
 
 const Footer: React.FC = () => {
-  const theme = useTheme(); // Access the current theme
 
-  console.log("Theme Secondary Main:", theme.palette.secondary.main);
-  console.log("Theme Text Secondary:", theme.palette.text.secondary);
+  const theme = useTheme(); // Access the default MUI theme
 
   return (
-    <Box
+    <Paper
       component="footer"
+      square
+      elevation={3}
       sx={{
-        backgroundColor: `${theme.palette.secondary.main} !important`, // Dynamic theme color
-        color: theme.palette.text.secondary, // Dynamic text color
-        textAlign: "center",
-        padding: "16px",
-      }}
+         backgroundColor: theme.palette.primary.main,
+         color: theme.palette.primary.contrastText,
+         textAlign: "center",
+         padding: theme.spacing(2),
+       }}
     >
       <Typography variant="body2">
-        © {new Date().getFullYear()} My Blog. All rights reserved.
+        © {new Date().getFullYear()} My App. All rights reserved.
       </Typography>
-    </Box>
+    </Paper>
   );
 };
 
