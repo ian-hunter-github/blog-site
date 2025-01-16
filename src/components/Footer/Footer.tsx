@@ -1,13 +1,14 @@
 import React from "react";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Paper, Typography, useTheme } from "@mui/material";
 
 const Footer: React.FC = () => {
 
   const theme = useTheme(); // Access the default MUI theme
 
   return (
-    <Box
+    <Paper
       component="footer"
+      square
       sx={{
         position: "sticky", // Keeps it visible
         bottom: 0,
@@ -20,7 +21,7 @@ const Footer: React.FC = () => {
       <Typography variant="body2">
         © {new Date().getFullYear()} My Blog. All rights reserved.
       </Typography>
-    </Box>
+    </Paper>
   );
 
   // return (
