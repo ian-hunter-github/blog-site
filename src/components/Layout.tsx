@@ -16,13 +16,16 @@ export default function Layout({ children }: LayoutProps) {
       }}
     >
       <Header />
-      <main style={{ flex: 1, padding: "16px" }}>
+      <div
+        style={{
+          flex: 1, // Grow to fill available space
+          overflowY: "auto", // Enable scrolling for content
+          padding: "16px",
+        }}
+      >
         {children}
-      </main>
+      </div>
       <Footer />
     </div>
   );
 }
-
-// Add this line to resolve the module issue
-export { };
