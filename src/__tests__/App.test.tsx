@@ -14,4 +14,3 @@ test('checks mocked environment variables', () => {
   expect(fetchRemoteData).toBe('false');
 });
 
-// test('Failure', () => expect(true).toBe(false))

@@ -3,6 +3,7 @@ import { usePosts } from "../context/PostsContext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import { getEnv } from "../utils/env";
 
 const renderHTML = (text: string) => {
   const processedText = text.replace(/\\n/g, "\n"); // Ensure escaped newlines are converted
@@ -16,6 +17,7 @@ const renderHTML = (text: string) => {
 };
 
 const BlogPostPage = () => {
+
   const { id } = useParams<{ id: string }>(); // Retrieve post ID from route
   const { posts } = usePosts(); // Access posts from context
 

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { BlogPost } from "../types/blog";
-import { getEnv } from '../utils/env';
+import { getEnvVar } from "../utils/envWrapper";
 
 interface Post {
   id: string;
@@ -17,8 +17,6 @@ interface PostsContextType {
   setPosts: React.Dispatch<React.SetStateAction<Post[] | null>>;
 }
 
-const { VITE_BACKEND_URL } = getEnv();
-
 // Create the PostsContext with a default value of undefined
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
 
@@ -33,25 +31,29 @@ export const usePosts = () => {
 
 interface PostsProviderProps {
   children: ReactNode;
+  initialPosts?: Post[]; // Optional initialPosts prop for testing
 }
 
 // PostsProvider component
-export const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
-  const [posts, setPosts] = useState<Post[] | null>(null);
+export const PostsProvider: React.FC<PostsProviderProps> = ({ children, initialPosts }) => {
+  const [posts, setPosts] = useState<Post[] | null>(initialPosts ?? null);
 
   useEffect(() => {
-    if (posts === null) {
+    if (posts === null && getEnvVar("VITE_FETCH_REMOTE_DATA") === "true") {
+      // Only fetch posts if the flag is true
       fetchPosts();
+    } else if (posts === null) {
+      console.log("Fetching skipped due to VITE_FETCH_REMOTE_DATA being false");
     }
   }, [posts]);
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(VITE_BACKEND_URL + "/fetchAll");
+      const response = await fetch(getEnvVar("VITE_BACKEND_URL") + "/fetchAll");
       const data = await response.json();
       const processedPosts = data.posts.map((post: BlogPost) => ({
         ...post,
-        content: post.content.replace(/\n/g, "\n\n"),
+        content: post.content.replace(/\n/g, "\n\n"), // Ensure proper spacing
       }));
       setPosts(processedPosts || []);
     } catch (error) {
@@ -59,7 +61,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
       setPosts([]);
     }
   };
-  
+
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
       {children}
