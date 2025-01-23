@@ -13,3 +13,5 @@ test('checks mocked environment variables', () => {
   expect(backendUrl).toBe('http://mock-backend-url.com');
   expect(fetchRemoteData).toBe('false');
 });
+
+// test('Failure', () => expect(true).toBe(false))

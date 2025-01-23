@@ -6,12 +6,16 @@
   "scripts": {
     "start": "vite --config vite.config.ts",
     "dev": "vite --config vite.config.ts",
-    "build": "vite build --config vite.config.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "serve": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+
+    "build": "npm run test:unit && vite build",
+    "test:unit": "vitest --environment jsdom run",
+    "test:e2e": "start-server-and-test preview http://localhost:4173/ 'cypress open --e2e'"
+  
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
