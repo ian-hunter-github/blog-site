@@ -14,7 +14,7 @@ export async function loadMarkdownPosts(): Promise<BlogPost[]> {
 
   try {
     // List of markdown files to fetch
-    const files: any[] = []; // Add all markdown filenames here
+    const files: unknown[] = []; // Add all markdown filenames here
     console.log("Fetching files:", files); // Debug file list
 
     // Fetch and process all markdown files

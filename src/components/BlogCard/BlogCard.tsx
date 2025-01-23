@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, Box } from "@mui/material";
 import { BlogPost } from "../../types/blog";
-import BlogCardStyles from "./BlogCardStyles.ts";
+import BlogCardStyles from "./BlogCardStyles";
 
 interface BlogCardProps {
   post: BlogPost;

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { BlogPost } from "../types/blog";
+import { getEnv } from '../utils/env';
 
 interface Post {
   id: string;
@@ -15,6 +16,8 @@ interface PostsContextType {
   posts: Post[] | null;
   setPosts: React.Dispatch<React.SetStateAction<Post[] | null>>;
 }
+
+const { VITE_BACKEND_URL } = getEnv();
 
 // Create the PostsContext with a default value of undefined
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
@@ -44,7 +47,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/fetchAll`);
+      const response = await fetch(VITE_BACKEND_URL + "/fetchAll");
       const data = await response.json();
       const processedPosts = data.posts.map((post: BlogPost) => ({
         ...post,

@@ -19,35 +19,44 @@ build/
 # Vite-specific artifacts
 .vite/
 .vite-cache/
+.vitest/
+.vitest-cache/
+.cache/
 
 # Editor and IDE files
-.DS_Store
 .vscode/
 .idea/
 *.swp
+*.iml
 
 # System files
+.DS_Store
 Thumbs.db
 ehthumbs.db
 *.stackdump
 
 # Coverage outputs
 coverage/
-*.lcov
+.lcov/
+.nyc_output/
 
 # Miscellaneous
 *.lock
 *.tmp
 *.temp
+*.bak
+*.orig
+*.pid
+*.seed
 
-# Package manager files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# Package manager files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 
 # Testing
-jest-html-reports/
-jest-report.json
+*.test-results.json
+*.snap
 
 # Netlify
 netlify.toml
@@ -55,4 +64,3 @@ netlify.toml
 # Compressed files
 .tgz
 .zip
-
