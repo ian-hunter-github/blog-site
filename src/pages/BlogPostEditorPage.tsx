@@ -19,8 +19,9 @@ import ListItemText from "@mui/material/ListItemText";
 import CircularProgress from "@mui/material/CircularProgress";
 import SearchIcon from "@mui/icons-material/Search";
 import { BlogPost } from "../types/blog";
+import { getEnvVar } from "../utils/envWrapper";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = getEnvVar('VITE_BACKEND_URL');
 
 const renderHTML = (text: string) => {
   const processedText = text.replace(/\\n/g, "\n");
