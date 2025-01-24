@@ -1,58 +1,65 @@
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import blogPostService from '../services/blogPostService';
-import { BlogPost } from '../types/blog';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import blogPostService from "../services/blogPostService";
+import { BlogPost } from "../types/blog";
 
-const renderMarkdown = (content: string) => (
-  <ReactMarkdown
-    children={content}
-    remarkPlugins={[remarkGfm]}
-    rehypePlugins={[rehypeRaw]}
-  />
-);
+const renderMarkdown = (text: string) => {
+  const processedText = text.replace(/\\n/g, "\n"); // Convert escaped newlines for proper markdown rendering
+  return (
+    <ReactMarkdown
+      children={processedText}
+      remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown (tables, etc.)
+      rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
+    />
+  );
+};
 
-const BlogPostPage = () => {
+const BlogPostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (!id) return;
+
     const fetchPost = async () => {
       try {
-        if (id) {
-          const fetchedPost = await blogPostService.fetchById(id);
-          if (fetchedPost) {
-            fetchedPost.content = fetchedPost.content.replace(/\\n/g, '\n\n'); // Ensure spacing
-            setPost(fetchedPost);
-          } else {
-            setError('Post not found.');
-          }
+        setLoading(true);
+        console.log(`Fetching post with id: ${id}`);
+        const fetchedPost = await blogPostService.fetchPostByIdWithCache(id);
+        if (fetchedPost) {
+          setPost(fetchedPost);
         } else {
-          setError('No post ID provided.');
+          console.warn(`Post with id ${id} not found.`);
         }
-      } catch (err) {
-        setError('Error fetching post. Please try again later.');
-        console.error(err);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPost();
   }, [id]);
 
-  if (error) {
+  if (loading) {
     return (
       <div>
-        <h1>Error</h1>
-        <p>{error}</p>
+        <p>Loading...</p>
       </div>
     );
   }
 
   if (!post) {
-    return <p>Loading...</p>;
+    return (
+      <div>
+        <h1>Post Not Found</h1>
+        <p>The post you are looking for does not exist or has been removed.</p>
+      </div>
+    );
   }
 
   return (

@@ -368,70 +368,50 @@ export const getEnvVar = (key: string): string => {
 };
 =======
 src/utils/__tests__/MarkdownHandling.test.jsx
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { PostsProvider } from '../../context/PostsContext';
+import blogPostService from '../../services/blogPostService';
 import BlogPostPage from '../../pages/BlogPostPage';
 
-import { mockEnvVars, restoreEnvVars } from '../mockEnv';
-
-import { vi } from 'vitest';
-
-const mockPosts = [
-  {
-    id: '1',
-    title: 'Markdown Heading',
-    content: 'This is a sample content with markdown.',
-    author: 'Test Author',
-    date: '2023-01-01',
-    image: '/placeholder.png',
+vi.mock('../../services/blogPostService', () => ({
+  default: {
+    fetchById: vi.fn(),
   },
-];
+}));
+
+const mockPost = {
+  id: '1',
+  title: 'Markdown Heading',
+  content: 'This is a sample content with markdown.',
+  summary: 'A brief summary of the post.',
+  created_at: '2023-01-01',
+  author: 'Test Author',
+  image: '/placeholder.png',
+};
 
 describe('Markdown Handling', () => {
-
-  const consoleSpy = vi.spyOn(console, 'log');
-
-  beforeEach(() => {
-    mockEnvVars({
-      VITE_BACKEND_URL: 'http://mock-backend.local',
-      VITE_FETCH_REMOTE_DATA: 'false',
-    });
-    consoleSpy.mockImplementation(() => { }); // Mock implementation
-  });
-
   afterEach(() => {
-    restoreEnvVars();
-    consoleSpy.mockRestore(); // Restore the original console.log behavior    
+    vi.resetAllMocks();
   });
 
-  test('renders valid markdown in BlogPostPage', () => {
-
-    // Check that mocked values are being used
-    expect(import.meta.env.VITE_FETCH_REMOTE_DATA).toBe('false');
+  test('renders valid markdown in BlogPostPage', async () => {
+    // Mock the fetchById method to resolve with mockPost
+    blogPostService.fetchById.mockResolvedValue(mockPost);
 
     render(
-      <MemoryRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-        initialEntries={['/posts/1']}
-      >
-        <PostsProvider initialPosts={mockPosts}>
-          <Routes>
-            <Route path="/posts/:id" element={<BlogPostPage />} />
-          </Routes>
-        </PostsProvider>
+      <MemoryRouter initialEntries={['/posts/1']}>
+        <Routes>
+          <Route path="/posts/:id" element={<BlogPostPage />} />
+        </Routes>
       </MemoryRouter>
     );
 
-    // Verify that the correct post is rendered
-    expect(screen.getByText(/Markdown Heading/i)).toBeInTheDocument();
-    expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
-
+    // Wait for the post to be rendered
+    await waitFor(() => {
+      expect(screen.getByText(/Markdown Heading/i)).toBeInTheDocument();
+      expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
+    });
   });
-
 });
 =======
 src/utils/env.ts
@@ -1046,36 +1026,57 @@ test('checks mocked environment variables', () => {
 
 =======
 src/__tests__/Navigation.test.jsx
-import { test, expect, describe, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import Header from '../components/Header/Header';
+import { test, expect, describe, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import Header from "../components/Header/Header";
+import * as ResponsiveContext from "../hooks/useResponsive";
 
-// Mock Material-UI's useMediaQuery for responsive rendering
-vi.mock('@mui/material', async (original) => {
-  const actual = await original();
-  return {
-    ...actual,
-    useMediaQuery: vi.fn().mockReturnValue(true), // Force large screen
-  };
-});
+describe("Navigation Tests", () => {
+  test("renders navigation links on large screens", () => {
+    // Mock the responsive context to simulate a large screen
+    vi.spyOn(ResponsiveContext, "useResponsive").mockReturnValue({
+      isSmall: false,
+      isMedium: true,
+      isLarge: true,
+    });
 
-describe('Navigation Tests', () => {
-  test('navigates via Header menu links', () => {
     render(
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <BrowserRouter>
         <Header />
       </BrowserRouter>
     );
 
-    const aboutText = screen.getByText(/About/i); // Case-insensitive match
-    expect(aboutText).toBeInTheDocument();
+    expect(screen.getByText(/About/i)).toBeInTheDocument();
+    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
+    expect(screen.getByText(/Editor/i)).toBeInTheDocument();
+  });
 
+  test("renders menu button on small screens and displays menu options", () => {
+    // Mock the responsive context to simulate a small screen
+    vi.spyOn(ResponsiveContext, "useResponsive").mockReturnValue({
+      isSmall: true,
+      isMedium: false,
+      isLarge: false,
+    });
+
+    render(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>
+    );
+
+    // Verify menu button is present
+    const menuButton = screen.getByLabelText(/menu/i);
+    expect(menuButton).toBeInTheDocument();
+
+    // Simulate clicking the menu button
+    fireEvent.click(menuButton);
+
+    // Verify menu options appear
+    expect(screen.getByText(/About/i)).toBeInTheDocument();
+    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
+    expect(screen.getByText(/Editor/i)).toBeInTheDocument();
   });
 });
 =======
@@ -1301,47 +1302,66 @@ export default function ContactPage() {
 
 =======
 src/pages/BlogPostPage.tsx
-import { useParams } from "react-router-dom";
-import { usePosts } from "../context/PostsContext";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
-import { getEnv } from "../utils/env";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
+import blogPostService from '../services/blogPostService';
+import { BlogPost } from '../types/blog';
 
-const renderHTML = (text: string) => {
-  const processedText = text.replace(/\\n/g, "\n"); // Ensure escaped newlines are converted
-  return (
-    <ReactMarkdown
-      children={processedText}
-      remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown (tables, etc.)
-      rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
-    />
-  );
-};
+const BlogPostPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const BlogPostPage = () => {
+  useEffect(() => {
+    if (!id) {
+      setError('No ID provided');
+      setLoading(false);
+      return;
+    }
 
-  const { id } = useParams<{ id: string }>(); // Retrieve post ID from route
-  const { posts } = usePosts(); // Access posts from context
+    const fetchPost = async () => {
+      try {
+        const fetchedPost = await blogPostService.fetchPostByIdWithCache(id);
+        setPost(fetchedPost);
+      } catch (err) {
+        setError('Failed to fetch post');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Ensure posts are valid and find the specific post by ID
-  const post = Array.isArray(posts) ? posts.find((post) => post.id == id) : null;
+    fetchPost();
+  }, [id]);
 
-  if (!post) {
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error || !post) {
     return (
-      <>
+      <div>
         <h1>Post Not Found</h1>
-        <p>The post you are looking for does not exist or has been removed.</p>
-      </>
+        <p>{error || 'The requested post could not be found.'}</p>
+      </div>
     );
   }
 
   return (
-    <>
+    <div>
       <h1>{post.title}</h1>
       <p>{post.summary}</p>
-      <div>{renderHTML(post.content)}</div>
-    </>
+      <div>
+        <ReactMarkdown
+          children={post.content} // Raw markdown content from the post
+          remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown
+          rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
+        />
+      </div>
+    </div>
   );
 };
 
@@ -1369,8 +1389,9 @@ import ListItemText from "@mui/material/ListItemText";
 import CircularProgress from "@mui/material/CircularProgress";
 import SearchIcon from "@mui/icons-material/Search";
 import { BlogPost } from "../types/blog";
+import { getEnvVar } from "../utils/envWrapper";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = getEnvVar('VITE_BACKEND_URL');
 
 const renderHTML = (text: string) => {
   const processedText = text.replace(/\\n/g, "\n");
@@ -1902,6 +1923,127 @@ const theme = createTheme({
 });
 
 export default theme;
+=======
+src/services/__mocks__/blogPostService.ts
+export const blogPostService = {
+    fetchPosts: vi.fn(() =>
+      Promise.resolve({
+        posts: [
+          { id: "1", title: "Test Post", content: "Sample content" },
+        ],
+      })
+    ),
+  
+    fetchPostById: vi.fn((id: string) =>
+      Promise.resolve({
+        id,
+        title: `Test Post ${id}`,
+        content: `Sample content for post ${id}`,
+      })
+    ),
+  };
+  =======
+src/services/blogPostService.ts
+import { getEnvVar } from '../utils/envWrapper';
+import { BlogPost } from '../types/blog';
+
+const BASE_URL = getEnvVar('VITE_BACKEND_URL');
+
+// Cache object for blog posts
+const blogPostCache: Record<string, { post: BlogPost; fetchedAt: number }> = {};
+
+const blogPostService = {
+  /**
+   * Fetch all blog posts from the server.
+   * @returns Promise resolving to an array of blog posts.
+   */
+  async fetchAll(): Promise<BlogPost[]> {
+    try {
+      const response = await fetch(`${BASE_URL}/fetchAll`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching posts: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const posts: BlogPost[] = data.posts || [];
+
+      // Update cache with fetched posts
+      const now = Date.now();
+      posts.forEach((post) => {
+        blogPostCache[post.id] = { post, fetchedAt: now };
+      });
+
+      return posts;
+    } catch (error) {
+      console.error('Error fetching all posts:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch a blog post by its ID from the server using a URL parameter.
+   * @param id The ID of the blog post to fetch.
+   * @returns Promise resolving to a blog post.
+   */
+  async fetchById(id: string): Promise<BlogPost | null> {
+    try {
+      const response = await fetch(`${BASE_URL}/findById?id=${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching post by ID: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.post || null;
+    } catch (error) {
+      console.error('Error fetching post by ID:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch a blog post by its ID using cache validation with `HEAD`.
+   * @param id The ID of the blog post to fetch.
+   * @returns Promise resolving to a blog post.
+   */
+  async fetchPostByIdWithCache(id: string): Promise<BlogPost | null> {
+    const cached = blogPostCache[id];
+    if (cached) {
+      try {
+        const headResponse = await fetch(`${BASE_URL}/findById?id=${id}`, {
+          method: 'HEAD',
+        });
+
+        const serverTimestamp = new Date(headResponse.headers.get('Last-Modified') || '').getTime();
+        if (cached.fetchedAt >= serverTimestamp) {
+          return cached.post; // Return cached post if up-to-date
+        }
+      } catch (error) {
+        console.error('Error validating cache with HEAD request:', error);
+      }
+    }
+
+    // Fetch post from the server if cache is missing or stale
+    const post = await this.fetchById(id);
+    if (post) {
+      blogPostCache[id] = { post, fetchedAt: Date.now() }; // Update cache
+    }
+    return post;
+  },
+};
+
+export default blogPostService;
 =======
 public/index.html
 <!DOCTYPE html>

@@ -1,32 +1,34 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import blogPostService from '../../services/blogPostService';
 import BlogPostPage from '../../pages/BlogPostPage';
+import blogPostService from '../../services/blogPostService';
+import { vi } from 'vitest';
 
 vi.mock('../../services/blogPostService', () => ({
   default: {
-    fetchById: vi.fn(),
+    fetchPostByIdWithCache: vi.fn(),
   },
 }));
 
-const mockPost = {
-  id: '1',
-  title: 'Markdown Heading',
-  content: 'This is a sample content with markdown.',
-  summary: 'A brief summary of the post.',
-  created_at: '2023-01-01',
-  author: 'Test Author',
-  image: '/placeholder.png',
-};
-
 describe('Markdown Handling', () => {
-  afterEach(() => {
-    vi.resetAllMocks();
+  const mockPost = {
+    id: '1',
+    title: 'Markdown Heading',
+    content: 'This is a sample content with markdown.\n\nMore text.',
+    author: 'Test Author',
+    date: '2023-01-01',
+    image: '/placeholder.png',
+  };
+
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
   });
 
   test('renders valid markdown in BlogPostPage', async () => {
-    // Mock the fetchById method to resolve with mockPost
-    blogPostService.fetchById.mockResolvedValue(mockPost);
+    // Mock the fetchPostByIdWithCache method
+    vi.mocked(blogPostService.fetchPostByIdWithCache).mockResolvedValue(mockPost);
 
     render(
       <MemoryRouter initialEntries={['/posts/1']}>
@@ -36,10 +38,39 @@ describe('Markdown Handling', () => {
       </MemoryRouter>
     );
 
-    // Wait for the post to be rendered
+    // Ensure the post is fetched and rendered correctly
     await waitFor(() => {
       expect(screen.getByText(/Markdown Heading/i)).toBeInTheDocument();
       expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
     });
+
+    // Verify the service call
+    expect(blogPostService.fetchPostByIdWithCache).toHaveBeenCalledWith('1');
+    expect(blogPostService.fetchPostByIdWithCache).toHaveBeenCalledOnce();
+  });
+
+  test('renders "Post Not Found" when post is missing', async () => {
+    // Mock the fetchPostByIdWithCache method to return null
+    vi.mocked(blogPostService.fetchPostByIdWithCache).mockResolvedValue(null);
+
+    render(
+      <MemoryRouter initialEntries={['/posts/1']}>
+        <Routes>
+          <Route path="/posts/:id" element={<BlogPostPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // Ensure the "Post Not Found" message is rendered
+    await waitFor(() => {
+      expect(screen.getByText(/Post Not Found/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/The post you are looking for does not exist or has been removed./i)
+      ).toBeInTheDocument();
+    });
+
+    // Verify the service call
+    expect(blogPostService.fetchPostByIdWithCache).toHaveBeenCalledWith('1');
+    expect(blogPostService.fetchPostByIdWithCache).toHaveBeenCalledOnce();
   });
 });
