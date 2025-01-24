@@ -1,44 +1,66 @@
-import { useParams } from "react-router-dom";
-import { usePosts } from "../context/PostsContext";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
-import { getEnv } from "../utils/env";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import blogPostService from '../services/blogPostService';
+import { BlogPost } from '../types/blog';
 
-const renderHTML = (text: string) => {
-  const processedText = text.replace(/\\n/g, "\n"); // Ensure escaped newlines are converted
-  return (
-    <ReactMarkdown
-      children={processedText}
-      remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown (tables, etc.)
-      rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
-    />
-  );
-};
+const renderMarkdown = (content: string) => (
+  <ReactMarkdown
+    children={content}
+    remarkPlugins={[remarkGfm]}
+    rehypePlugins={[rehypeRaw]}
+  />
+);
 
 const BlogPostPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const { id } = useParams<{ id: string }>(); // Retrieve post ID from route
-  const { posts } = usePosts(); // Access posts from context
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        if (id) {
+          const fetchedPost = await blogPostService.fetchById(id);
+          if (fetchedPost) {
+            fetchedPost.content = fetchedPost.content.replace(/\\n/g, '\n\n'); // Ensure spacing
+            setPost(fetchedPost);
+          } else {
+            setError('Post not found.');
+          }
+        } else {
+          setError('No post ID provided.');
+        }
+      } catch (err) {
+        setError('Error fetching post. Please try again later.');
+        console.error(err);
+      }
+    };
 
-  // Ensure posts are valid and find the specific post by ID
-  const post = Array.isArray(posts) ? posts.find((post) => post.id == id) : null;
+    fetchPost();
+  }, [id]);
 
-  if (!post) {
+  if (error) {
     return (
-      <>
-        <h1>Post Not Found</h1>
-        <p>The post you are looking for does not exist or has been removed.</p>
-      </>
+      <div>
+        <h1>Error</h1>
+        <p>{error}</p>
+      </div>
     );
   }
 
+  if (!post) {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <>
+    <div>
       <h1>{post.title}</h1>
       <p>{post.summary}</p>
-      <div>{renderHTML(post.content)}</div>
-    </>
+      <div>{renderMarkdown(post.content)}</div>
+    </div>
   );
 };
 

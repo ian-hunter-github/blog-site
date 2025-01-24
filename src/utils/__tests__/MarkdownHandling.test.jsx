@@ -1,65 +1,45 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { PostsProvider } from '../../context/PostsContext';
+import blogPostService from '../../services/blogPostService';
 import BlogPostPage from '../../pages/BlogPostPage';
 
-import { mockEnvVars, restoreEnvVars } from '../mockEnv';
-
-import { vi } from 'vitest';
-
-const mockPosts = [
-  {
-    id: '1',
-    title: 'Markdown Heading',
-    content: 'This is a sample content with markdown.',
-    author: 'Test Author',
-    date: '2023-01-01',
-    image: '/placeholder.png',
+vi.mock('../../services/blogPostService', () => ({
+  default: {
+    fetchById: vi.fn(),
   },
-];
+}));
+
+const mockPost = {
+  id: '1',
+  title: 'Markdown Heading',
+  content: 'This is a sample content with markdown.',
+  summary: 'A brief summary of the post.',
+  created_at: '2023-01-01',
+  author: 'Test Author',
+  image: '/placeholder.png',
+};
 
 describe('Markdown Handling', () => {
-
-  const consoleSpy = vi.spyOn(console, 'log');
-
-  beforeEach(() => {
-    mockEnvVars({
-      VITE_BACKEND_URL: 'http://mock-backend.local',
-      VITE_FETCH_REMOTE_DATA: 'false',
-    });
-    consoleSpy.mockImplementation(() => { }); // Mock implementation
-  });
-
   afterEach(() => {
-    restoreEnvVars();
-    consoleSpy.mockRestore(); // Restore the original console.log behavior    
+    vi.resetAllMocks();
   });
 
-  test('renders valid markdown in BlogPostPage', () => {
-
-    // Check that mocked values are being used
-    expect(import.meta.env.VITE_FETCH_REMOTE_DATA).toBe('false');
+  test('renders valid markdown in BlogPostPage', async () => {
+    // Mock the fetchById method to resolve with mockPost
+    blogPostService.fetchById.mockResolvedValue(mockPost);
 
     render(
-      <MemoryRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-        initialEntries={['/posts/1']}
-      >
-        <PostsProvider initialPosts={mockPosts}>
-          <Routes>
-            <Route path="/posts/:id" element={<BlogPostPage />} />
-          </Routes>
-        </PostsProvider>
+      <MemoryRouter initialEntries={['/posts/1']}>
+        <Routes>
+          <Route path="/posts/:id" element={<BlogPostPage />} />
+        </Routes>
       </MemoryRouter>
     );
 
-    // Verify that the correct post is rendered
-    expect(screen.getByText(/Markdown Heading/i)).toBeInTheDocument();
-    expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
-
+    // Wait for the post to be rendered
+    await waitFor(() => {
+      expect(screen.getByText(/Markdown Heading/i)).toBeInTheDocument();
+      expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
+    });
   });
-
 });
