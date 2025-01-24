@@ -45,7 +45,6 @@ try {
 }
 =======
 src/App.tsx
-// App.tsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import BlogPostPage from "./pages/BlogPostPage";
@@ -59,22 +58,27 @@ import { CssBaseline } from "@mui/material";
 const App = () => {
 
   return (
-      <>
-        <CssBaseline /> {/* Normalize and apply global Material-UI styles */}
-        <PostsProvider>
-          <Router>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/post/:id" element={<BlogPostPage />} />
-                <Route path="/editor" element={<BlogPostEditorPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-              </Routes>
-            </Layout>
-          </Router>
-        </PostsProvider>
-      </>
+    <>
+      <CssBaseline /> {/* Normalize and apply global Material-UI styles */}
+      <PostsProvider>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/post/:id" element={<BlogPostPage />} />
+              <Route path="/editor" element={<BlogPostEditorPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </PostsProvider>
+    </>
   );
 };
 
@@ -371,6 +375,8 @@ import BlogPostPage from '../../pages/BlogPostPage';
 
 import { mockEnvVars, restoreEnvVars } from '../mockEnv';
 
+import { vi } from 'vitest';
+
 const mockPosts = [
   {
     id: '1',
@@ -384,24 +390,34 @@ const mockPosts = [
 
 describe('Markdown Handling', () => {
 
-  afterEach(() => {
-    restoreEnvVars();
-  });
+  const consoleSpy = vi.spyOn(console, 'log');
 
-  test('renders valid markdown in BlogPostPage', () => {
-
+  beforeEach(() => {
     mockEnvVars({
       VITE_BACKEND_URL: 'http://mock-backend.local',
       VITE_FETCH_REMOTE_DATA: 'false',
     });
+    consoleSpy.mockImplementation(() => { }); // Mock implementation
+  });
+
+  afterEach(() => {
+    restoreEnvVars();
+    consoleSpy.mockRestore(); // Restore the original console.log behavior    
+  });
+
+  test('renders valid markdown in BlogPostPage', () => {
 
     // Check that mocked values are being used
     expect(import.meta.env.VITE_FETCH_REMOTE_DATA).toBe('false');
 
-    const mockSetPosts = vi.fn(); // Mock function for setPosts
-
     render(
-      <MemoryRouter initialEntries={['/posts/1']}>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+        initialEntries={['/posts/1']}
+      >
         <PostsProvider initialPosts={mockPosts}>
           <Routes>
             <Route path="/posts/:id" element={<BlogPostPage />} />
@@ -415,7 +431,7 @@ describe('Markdown Handling', () => {
     expect(screen.getByText(/This is a sample content with markdown./i)).toBeInTheDocument();
 
   });
-  
+
 });
 =======
 src/utils/env.ts
@@ -1045,7 +1061,6 @@ import { test, expect, describe, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Header from '../components/Header/Header';
-import { useMediaQuery } from '@mui/material';
 
 // Mock Material-UI's useMediaQuery for responsive rendering
 vi.mock('@mui/material', async (original) => {
@@ -1059,7 +1074,12 @@ vi.mock('@mui/material', async (original) => {
 describe('Navigation Tests', () => {
   test('navigates via Header menu links', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Header />
       </BrowserRouter>
     );
@@ -1067,7 +1087,7 @@ describe('Navigation Tests', () => {
     const aboutText = screen.getByText(/About/i); // Case-insensitive match
     expect(aboutText).toBeInTheDocument();
 
-   });
+  });
 });
 =======
 src/__tests__/EnvVars.test.ts
@@ -1851,6 +1871,167 @@ const theme = createTheme({
 });
 
 export default theme;
+=======
+public/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React Blog</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+
+=======
+public/content/file-list.json
+[
+    "post1.md"
+]=======
+public/content/post1.md
+---
+title: "Exploring Tokyo: A Blend of Tradition and Modernity"
+date: 2024-11-06
+author: Ian
+categories:
+  - Travel
+tags:
+  - Tokyo
+  - Japan
+  - TravelTips
+excerpt: "Discover the perfect mix of ancient traditions and cutting-edge technology as we explore the vibrant city of Tokyo."
+summary: "Discover the perfect mix of ancient traditions and cutting-edge technology as we explore the vibrant city of Tokyo."
+---
+
+Tokyo, a city where ancient traditions meet futuristic innovation, is a must-visit destination for any traveler. My journey through this vibrant metropolis revealed a unique blend of historical landmarks, modern attractions, and delightful culinary experiences.
+
+### Arrival in Tokyo
+Landing at Haneda Airport at 22:30, the city welcomed me with its vibrant lights and bustling energy. A short stay near Haneda allowed for a relaxed start to my adventure.
+
+### Highlights of My Tokyo Itinerary
+Here are some of the key places and experiences that stood out during my stay:
+
+#### 1. **Daiso and Stationery Shops**
+As a fan of unique and affordable shopping, I explored Daiso, a renowned 100-yen shop, and visited stationery stores like Tokyu Hands and Itoya Ginza. These shops are a treasure trove of Japanese creativity.
+
+#### 2. **Hamarikyu Gardens**
+Meeting Cameron and Vanessa at Tokyo Station led to a serene afternoon at Hamarikyu Gardens, a peaceful retreat amidst the urban chaos.
+
+#### 3. **Yanaka's Old-World Charm**
+Walking through Yanaka, with its traditional atmosphere and quaint shops, felt like stepping back in time. Yanaka Cemetery and Yanaka Ginza were highlights of this experience.
+
+#### 4. **Shibuya Sky at Sunset**
+Watching the cityscape transform as the sun set over Tokyo was a breathtaking experience, providing the perfect blend of romance and awe.
+
+#### 5. **TeamLab Planets**
+The immersive digital art at TeamLab Planets was a highlight, blending technology and art in a way that left me inspired and amazed.
+
+### Practical Tips for Tokyo
+- **Transportation:** The train system is efficient and well-connected. Ensure you have a Suica or Pasmo card for convenience.
+- **Dining:** Budget-friendly and delicious options abound, from ramen shops to izakayas.
+- **Etiquette:** Always dispose of trash in designated areas and be mindful of the local customs.
+
+### Reflection
+Tokyo offers an unparalleled mix of past and present. Whether exploring ancient temples or marveling at futuristic skyscrapers, the city captivates at every turn. For travelers seeking a destination that defies expectations, Tokyo delivers in every way.
+
+Have you visited Tokyo? Share your experiences in the comments below!
+=======
+public/content/post2.md
+---
+title: "Getting Started with React and Material-UI"
+summary: "Learn how to build modern web applications with React and Material-UI."
+image: "/placeholder.svg"
+date: "2024-01-08"
+---
+
+Learn how to build modern web applications with **React** and **Material-UI**.
+
+## Key Features:
+- Pre-built components
+- Responsive design
+- Easy theming
+
+### Example Button:
+```javascript
+import React from 'react';
+import { Button } from '@mui/material';
+
+export default function App() {
+  return <Button variant="contained">Click Me</Button>;
+}
+
+
+---
+
+### **Explanation of the Structure**
+1. **Front Matter**:
+   The metadata section at the top, enclosed in `---`, contains:
+   - `title`: The title of the blog post.
+   - `summary`: A brief description of the post.
+   - `image`: The path to the image (use `/placeholder.svg` if no image is available).
+   - `date`: The publication date.
+
+2. **Markdown Content**:
+   After the `---`, the actual blog content begins, written in Markdown. For example:
+   - Headers like `#` or `##`.
+   - Lists using `-` or `1.`.
+   - Code blocks enclosed with triple backticks (` ``` `).
+   - Links in `[text](URL)` format.
+
+3. **Ending**:
+   After the Markdown content, you simply save the file. There is no additional syntax or ending keyword needed.
+
+---
+
+### **What to Do**
+- Create a directory `public/content/` in your project if it doesn't already exist.
+- Add the `post1.md` file (and any other `.md` files for additional posts) to this directory.
+
+Would you like more example `.md` files to test the Markdown rendering further?
+=======
+public/manifest.json
+{
+    "short_name": "React Blog",
+    "name": "React Blog Sample",
+    "icons": [
+      {
+        "src": "favicon.ico",
+        "sizes": "64x64 32x32 24x24 16x16",
+        "type": "image/x-icon"
+      },
+      {
+        "src": "logo192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "logo512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+  }
+  
+  =======
+public/robots.txt
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow:
 =======
 package-lock.json
 {
@@ -10971,5 +11152,21 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts', // Points to your setup file
   },
 });
+=======
+index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Raleway:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
 =======
 =======

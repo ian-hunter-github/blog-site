@@ -18,3 +18,5 @@ git clean -fdx
 # Show the current status
 echo "Repository successfully reset to the latest remote state."
 git status
+
+cp ../blog-site-env.txt ./.env
