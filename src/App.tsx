@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 import HomePage from "./pages/HomePage";
 import BlogPostPage from "./pages/BlogPostPage";
 import BlogPostEditorPage from "./pages/BlogPostEditorPage";
@@ -9,9 +10,8 @@ import PostsProvider from "./context/PostsContext";
 import { CssBaseline } from "@mui/material";
 
 const App = () => {
-
   return (
-    <>
+    <ErrorBoundary>
       <CssBaseline /> {/* Normalize and apply global Material-UI styles */}
       <PostsProvider>
         <Router
@@ -31,7 +31,7 @@ const App = () => {
           </Layout>
         </Router>
       </PostsProvider>
-    </>
+    </ErrorBoundary>
   );
 };
 

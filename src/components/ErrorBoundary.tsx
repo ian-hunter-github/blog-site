@@ -1,4 +1,6 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Button, Typography } from '@mui/material';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -6,34 +8,78 @@ interface ErrorBoundaryProps {
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  error?: Error;
+  errorInfo?: ErrorInfo;
+  resetCounter: number;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, resetCounter: 0 };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('Error caught by ErrorBoundary:', error, info);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState({ errorInfo });
+    console.error('Error Boundary caught:', error, errorInfo);
+  }
+
+  handleReset = () => {
+    // Reset all state and increment counter to force remount
+    this.setState({
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
+      resetCounter: this.state.resetCounter + 1
+    });
+  };
+
+  componentWillUnmount() {
+    // Clear any pending state updates
+    this.setState = () => {};
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '1rem', backgroundColor: '#f8d7da', color: '#842029', border: '1px solid #f5c2c7', borderRadius: '5px' }}>
-          <h2>Something went wrong.</h2>
-          <p>{this.state.error?.toString()}</p>
+        <div key={this.state.resetCounter} style={{ padding: '2rem', textAlign: 'center' }}>
+          <Typography variant="h4" gutterBottom>
+            Something went wrong
+          </Typography>
+          <Typography variant="body1" paragraph>
+            We're sorry for the inconvenience. Please try refreshing the page.
+          </Typography>
+          {process.env.NODE_ENV === 'development' && (
+            <Typography variant="caption" component="div" paragraph>
+              Error details: {this.state.error?.toString()}
+              <pre style={{ textAlign: 'left', marginTop: '1rem' }}>
+                {this.state.errorInfo?.componentStack}
+              </pre>
+            </Typography>
+          )}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.handleReset}
+          >
+            Try Again
+          </Button>
         </div>
       );
     }
 
-    return this.props.children;
+    return (
+      <div key={this.getResetKey()}>
+        {this.props.children}
+      </div>
+    );
+  }
+  getResetKey(): string {
+    return `error-boundary-${this.state.resetCounter}`;
   }
 }
 

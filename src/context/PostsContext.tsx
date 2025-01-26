@@ -1,10 +1,21 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
 import { BlogPost } from "../types/blog";
 import blogPostService from "../services/blogPostService";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 interface PostsContextType {
   posts: BlogPost[] | null;
   setPosts: React.Dispatch<React.SetStateAction<BlogPost[] | null>>;
+  currentPage: number;
+  totalPages: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  postsPerPage: number;
 }
 
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
@@ -23,26 +34,48 @@ interface PostsProviderProps {
 
 export const PostsProvider: React.FC<PostsProviderProps> = ({ children }) => {
   const [posts, setPosts] = useState<BlogPost[] | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 5;
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const allPosts = await blogPostService.fetchAll(); // Use the service
-        setPosts(allPosts); // Update the context with fetched posts
+        const allPosts = await blogPostService.fetchAll();
+        setPosts(allPosts);
+        setTotalPages(Math.ceil(allPosts.length / postsPerPage));
       } catch (error) {
         console.error("Error fetching posts in PostsProvider:", error);
       }
     };
 
     if (!posts || posts.length === 0) {
-      fetchPosts(); // Only fetch if posts are not already set
+      fetchPosts();
     }
   }, [posts]);
 
+  const getPaginatedPosts = () => {
+    if (!posts) return null;
+    const startIndex = (currentPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    return posts.slice(startIndex, endIndex);
+  };
+
   return (
-    <PostsContext.Provider value={{ posts, setPosts }}>
-      {children}
-    </PostsContext.Provider>
+    <ErrorBoundary>
+      <PostsContext.Provider
+        value={{
+          posts: getPaginatedPosts(),
+          setPosts,
+          currentPage,
+          totalPages,
+          setCurrentPage,
+          postsPerPage,
+        }}
+      >
+        {children}
+      </PostsContext.Provider>
+    </ErrorBoundary>
   );
 };
 

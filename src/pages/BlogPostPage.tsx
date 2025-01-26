@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import blogPostService from "../services/blogPostService";
 import { BlogPost } from "../types/blog";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const renderMarkdown = (text: string) => {
   const processedText = text.replace(/\\n/g, "\n"); // Convert escaped newlines for proper markdown rendering
@@ -14,6 +15,16 @@ const renderMarkdown = (text: string) => {
       remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown (tables, etc.)
       rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
     />
+  );
+};
+
+const BlogPostContent: React.FC<{ post: BlogPost }> = ({ post }) => {
+  return (
+    <div>
+      <h1>{post.title}</h1>
+      <p>{post.summary}</p>
+      <div>{renderMarkdown(post.content)}</div>
+    </div>
   );
 };
 
@@ -63,11 +74,9 @@ const BlogPostPage: React.FC = () => {
   }
 
   return (
-    <div>
-      <h1>{post.title}</h1>
-      <p>{post.summary}</p>
-      <div>{renderMarkdown(post.content)}</div>
-    </div>
+    <ErrorBoundary>
+      <BlogPostContent post={post} />
+    </ErrorBoundary>
   );
 };
 
