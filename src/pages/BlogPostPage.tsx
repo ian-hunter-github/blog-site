@@ -6,14 +6,15 @@ import rehypeRaw from "rehype-raw";
 import blogPostService from "../services/blogPostService";
 import { BlogPost } from "../types/blog";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { Box, CircularProgress } from "@mui/material";
 
 const renderMarkdown = (text: string) => {
-  const processedText = text.replace(/\\n/g, "\n"); // Convert escaped newlines for proper markdown rendering
+  const processedText = text.replace(/\\n/g, "\n");
   return (
     <ReactMarkdown
       children={processedText}
-      remarkPlugins={[remarkGfm]} // GitHub Flavored Markdown (tables, etc.)
-      rehypePlugins={[rehypeRaw]} // Allow raw HTML rendering
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
     />
   );
 };
@@ -58,9 +59,14 @@ const BlogPostPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
