@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
-import HomePage from "./pages/HomePage";
+import BlogPostListsPage from "./pages/BlogPostListsPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import BlogPostEditorPage from "./pages/BlogPostEditorPage";
 import AboutPage from "./pages/AboutPage";
@@ -22,7 +22,7 @@ const App = () => {
         >
           <Layout>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<BlogPostListsPage />} />
               <Route path="/post/:id" element={<BlogPostPage />} />
               <Route path="/editor" element={<BlogPostEditorPage />} />
               <Route path="/about" element={<AboutPage />} />

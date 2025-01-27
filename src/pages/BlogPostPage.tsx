@@ -23,7 +23,6 @@ const BlogPostContent: React.FC<{ post: BlogPost }> = ({ post }) => {
   return (
     <div>
       <h1>{post.title}</h1>
-      <p>{post.summary}</p>
       <div>{renderMarkdown(post.content)}</div>
     </div>
   );

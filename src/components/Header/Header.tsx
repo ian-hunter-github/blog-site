@@ -18,7 +18,7 @@ export default function Header() {
   const theme = useTheme();
 
   // Use the responsive hook
-  const { isMedium, isLarge } = useResponsive();
+  const { isMedium, isLarge, isSmall } = useResponsive();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -28,6 +28,9 @@ export default function Header() {
     setAnchorEl(null);
   };
 
+  const headerHeight = isSmall ? 100 : isMedium ? 100 : isLarge ? 200 : 200;
+  const logoSize = headerHeight - (headerHeight / 100) * 10;
+
   return (
     <AppBar
       position="sticky"
@@ -35,6 +38,7 @@ export default function Header() {
       sx={{
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.primary.contrastText,
+        height: headerHeight,
       }}
     >
       <Toolbar
@@ -42,6 +46,9 @@ export default function Header() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          minHeight: logoSize,
+          minWidth: logoSize,
+          py: 4,
         }}
       >
         {/* Logo Section */}
@@ -54,11 +61,16 @@ export default function Header() {
             alignItems: "center",
           }}
         >
-          <img src="/logo.png" alt="Blog Logo" width={150} height={40} />
+          <img
+            src="/logo-strength-50+.png"
+            alt="Blog Logo"
+            width={200}
+            height={200}
+          />
         </Link>
 
         {/* Links Section */}
-        {(isMedium || isLarge) ? (
+        {isMedium || isLarge ? (
           <Box sx={{ display: "flex", gap: 2 }}>
             {["about", "contact", "editor"].map((path) => (
               <Link

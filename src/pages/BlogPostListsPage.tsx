@@ -3,7 +3,7 @@ import { usePosts } from "../context/PostsContext";
 import BlogCard from "../components/BlogCard/BlogCard";
 import Pagination from "../components/Pagination";
 
-const HomePageContent = () => {
+const BlogPostListsPage = () => {
   const { posts, currentPage, totalPages, setCurrentPage } = usePosts();
 
   if (!posts) {
@@ -53,4 +53,4 @@ const HomePageContent = () => {
   );
 };
 
-export default HomePageContent;
+export default BlogPostListsPage;
