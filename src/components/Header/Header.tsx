@@ -20,6 +20,10 @@ export default function Header() {
   // Use the responsive hook
   const { isMedium, isLarge, isSmall } = useResponsive();
 
+  // Dynamic header height and logo size
+  const headerHeight = isSmall ? 80 : isMedium ? 100 : 120; // Adjust header height
+  const logoSize = headerHeight * 0.8; // Logo size is 80% of header height
+
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,9 +32,6 @@ export default function Header() {
     setAnchorEl(null);
   };
 
-  const headerHeight = isSmall ? 100 : isMedium ? 100 : isLarge ? 200 : 200;
-  const logoSize = headerHeight - (headerHeight / 100) * 10;
-
   return (
     <AppBar
       position="sticky"
@@ -38,17 +39,19 @@ export default function Header() {
       sx={{
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.primary.contrastText,
-        height: headerHeight,
+        height: headerHeight, // Dynamic header height
       }}
     >
       <Toolbar
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          minHeight: logoSize,
-          minWidth: logoSize,
-          py: 4,
+          justifyContent: "space-between", // Separate logo and links
+          alignItems: "center", // Center them vertically
+          height: "100%", // Match AppBar height
+          paddingTop: `${headerHeight * 0.1}px`, // 10% padding top
+          paddingBottom: `${headerHeight * 0.1}px`, // 10% padding bottom
+          paddingLeft: "1rem", // Add some left padding for spacing
+          paddingRight: "1rem", // Add some right padding for spacing
         }}
       >
         {/* Logo Section */}
@@ -64,8 +67,10 @@ export default function Header() {
           <img
             src="/logo-strength-50+.png"
             alt="Blog Logo"
-            width={200}
-            height={200}
+            style={{
+              height: logoSize, // Dynamically scale logo height
+              width: "auto", // Maintain aspect ratio
+            }}
           />
         </Link>
 
