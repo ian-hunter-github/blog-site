@@ -1,7 +1,7 @@
-import { getEnvVar } from '../utils/envWrapper';
-import { BlogPost } from '../types/blog';
+import { getEnvVar } from "../utils/envWrapper";
+import { BlogPost } from "../types/blog";
 
-const BASE_URL = getEnvVar('VITE_BACKEND_URL');
+const BASE_URL = getEnvVar("VITE_BACKEND_URL");
 
 // Cache object for blog posts
 const blogPostCache: Record<string, { post: BlogPost; fetchedAt: number }> = {};
@@ -14,9 +14,9 @@ const blogPostService = {
   async fetchAll(): Promise<BlogPost[]> {
     try {
       const response = await fetch(`${BASE_URL}/fetchAll`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -36,7 +36,7 @@ const blogPostService = {
       console.log(`Fetched ${posts.length} posts and updated cache.`);
       return posts;
     } catch (error) {
-      console.error('Error fetching all posts:', error);
+      console.error("Error fetching all posts:", error);
       throw error;
     }
   },
@@ -48,12 +48,15 @@ const blogPostService = {
    */
   async fetchById(id: string): Promise<BlogPost | null> {
     try {
-      const response = await fetch(`${BASE_URL}/findById?id=${encodeURIComponent(id)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${BASE_URL}/findById?id=${encodeURIComponent(id)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error fetching post by ID: ${response.statusText}`);
@@ -79,27 +82,40 @@ const blogPostService = {
     if (cached) {
       try {
         // Use HEAD to check if the post is up-to-date
-        const headResponse = await fetch(`${BASE_URL}/findById?id=${encodeURIComponent(id)}`, {
-          method: 'HEAD',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const headResponse = await fetch(
+          `${BASE_URL}/findById?id=${encodeURIComponent(id)}`,
+          {
+            method: "HEAD",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        const serverTimestampStr = headResponse.headers.get('Last-Modified');
-        console.log("TS FROM SERVER='" + serverTimestampStr + "'");
-        const serverTimestamp = serverTimestampStr ? new Date(serverTimestampStr).getTime() : NaN;
+        if (!headResponse.ok) {
+          throw new Error(`HEAD request failed: ${headResponse.statusText}`);
+        }
 
+        const serverTimestampStr = headResponse.headers.get("Last-Modified");
+        if (!serverTimestampStr) {
+          throw new Error("No Last-Modified header in HEAD response");
+        }
+
+        const serverTimestamp = new Date(serverTimestampStr).getTime();
         console.log(
           `HEAD request for ID ${id}: Server timestamp = ${serverTimestamp}, Cached timestamp = ${cached.fetchedAt}`
         );
 
-        if (!isNaN(serverTimestamp) && cached.fetchedAt >= serverTimestamp) {
+        if (cached.fetchedAt >= serverTimestamp) {
           console.log(`Returning cached post for ID ${id}.`);
           return cached.post; // Return cached post if up-to-date
         }
       } catch (error) {
-        console.error(`Error validating cache with HEAD request for ID ${id}:`, error);
+        console.error(
+          `Error validating cache with HEAD request for ID ${id}:`,
+          error
+        );
+        // If HEAD request fails, proceed to fetch fresh data
       }
     }
 

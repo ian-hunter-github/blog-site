@@ -14,7 +14,12 @@ describe("Navigation Tests", () => {
     });
 
     render(
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Header />
       </BrowserRouter>
     );
@@ -33,7 +38,12 @@ describe("Navigation Tests", () => {
     });
 
     render(
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Header />
       </BrowserRouter>
     );
