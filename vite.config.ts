@@ -21,10 +21,11 @@ export default defineConfig({
     process.env.NODE_ENV === "development"
       ? {
           proxy: {
-            "/.netlify/functions": {
+            "/api": {
               target: "http://localhost:8888",
               changeOrigin: true,
               secure: false,
+              rewrite: (path) => path.replace(/^\/api/, "/.netlify/functions"),
             },
           },
         }

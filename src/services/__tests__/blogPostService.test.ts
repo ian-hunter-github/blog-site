@@ -7,7 +7,7 @@ global.fetch = mockFetch;
 
 // Mock the environment variable
 vi.mock("../../utils/envWrapper", () => ({
-  getEnvVar: vi.fn(() => "http://test-api.com"),
+  getEnvVar: vi.fn(() => "/api"),
 }));
 
 describe("blogPostService", () => {
@@ -53,7 +53,7 @@ describe("blogPostService", () => {
 
       expect(result).toEqual(mockPosts);
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://test-api.com/fetchAll",
+        "/api/fetchAll",
         expect.objectContaining({
           method: "GET",
           headers: {
@@ -101,7 +101,7 @@ describe("blogPostService", () => {
 
       expect(result).toEqual(mockPost);
       expect(mockFetch).toHaveBeenCalledWith(
-        `http://test-api.com/findById?id=${encodeURIComponent(mockPost.id)}`,
+        `/api/findById?id=${encodeURIComponent(mockPost.id)}`,
         expect.objectContaining({
           method: "GET",
           headers: {

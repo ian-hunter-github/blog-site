@@ -1,7 +1,8 @@
-import { getEnvVar } from "../utils/envWrapper";
 import { BlogPost } from "../types/blog";
 
-const BASE_URL = getEnvVar("VITE_BACKEND_URL");
+const BASE_URL = import.meta.env.DEV
+  ? "/api"
+  : "https://blog-site-backend.netlify.app/.netlify/functions";
 
 // Cache object for blog posts
 const blogPostCache: Record<string, { post: BlogPost; fetchedAt: number }> = {};
@@ -13,18 +14,51 @@ const blogPostService = {
    */
   async fetchAll(): Promise<BlogPost[]> {
     try {
-      const response = await fetch(`${BASE_URL}/fetchAll`, {
+      const requestUrl = `${BASE_URL}${
+        BASE_URL.endsWith("/") ? "" : "/"
+      }fetchAll`;
+      console.log(`[fetchAll] Making request to: ${requestUrl}`);
+      console.log(
+        `[fetchAll] Full resolved URL: ${new URL(
+          requestUrl,
+          window.location.href
+        )}`
+      );
+      console.log(`[fetchAll] Request headers:`, {
+        "Content-Type": "application/json",
+      });
+
+      const startTime = performance.now();
+      const response = await fetch(requestUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
+      const endTime = performance.now();
+
+      console.log(
+        `[fetchAll] Request took ${(endTime - startTime).toFixed(2)}ms`
+      );
+      console.log(
+        `[fetchAll] Response status: ${response.status} ${response.statusText}`
+      );
+
+      // Log response headers if available
+      const responseHeaders: Record<string, string> = {};
+      if (response.headers) {
+        response.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+        console.log(`[fetchAll] Response headers:`, responseHeaders);
+      }
 
       if (!response.ok) {
         throw new Error(`Error fetching posts: ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log(`[fetchAll] Response data:`, data);
       const posts: BlogPost[] = data.posts || [];
 
       // Update cache with fetched posts
